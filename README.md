@@ -4,7 +4,7 @@
 건의 사항이나 오류 제보는 상단의 **Issues**를 통해 자세한 내용을 전달해 주시면 빠른 시일 내에 처리하도록 하겠습니다.<br>
 <br>
 사이트 : https://haesol00.github.io/ikbolCalculator/ <br>
-현재 버전 : **3.0.0a** <br>
+현재 버전 : **3.0.0b** <br>
 버프•너프 기준 : **2077시즌** <br>
 <br>
 스탯 계산기 v2.0 [바로가기](https://s-ea.tistory.com/m/entry/%EA%B0%80%EC%83%81%EC%95%BC%EA%B5%AC%EB%A6%AC%EA%B7%B8-IKBOL-%EC%8A%A4%ED%83%AF%EA%B3%84%EC%82%B0%EA%B8%B0-ver-2)<br>
