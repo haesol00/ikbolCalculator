@@ -34,6 +34,7 @@
         .pure-text { font-size: 0.9em; opacity: 0.85; margin-bottom: 5px; }
         .final-score { font-size: 2.8em; font-weight: 800; color: #fbbf24; display: block; }
         .age-tag { display: inline-block; margin-top: 10px; font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; }
+        .notice-text { display: block; margin-top: 10px; font-size: 0.75rem; color: #94a3b8; text-align: center; }
         .footer-area { margin-top: 20px; text-align: center; padding-bottom: 30px; }
         .footer-link a { 
             text-decoration: none; 
@@ -104,6 +105,7 @@
         <span class="final-score" id="finalStats">0.00</span>
         <div id="ageTag" class="age-tag" style="display:none;"></div>
     </div>
+    <span class="notice-text">* 실제 스탯 계산은 소수 첫째 자리에서 반올림됩니다.</span>
 </div>
 
 <div class="footer-area">
@@ -113,12 +115,12 @@
     </div>
     
     <div class="version-info">
-        버전: v3.0.0b  최종 업데이트 날짜: 2026. 1. 31.
+        버전: v3.0.0  최종 업데이트 날짜: 2026. 2. 10.
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcjfUCdhce96y24UmI-Mo5lBXswpNHFyaYrFYEL48ZtVLNe2xUAp31ceKpFGq3W0QBpQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHOvraFAfR3eAohv59DWRwMAGWtD0pmFZFJLwTIW4ZSKzMWzXSPiyiSc18jhYJFvcVDw/exec";
     const WV=1/70, WP=1/30, WC=1/350;
 
     let baseBuff = 0;
@@ -176,6 +178,7 @@
 
                     // 자동 군필 판정
                     let autoArmyCheck = (sheetArmy > 0);
+                    if (sheetAge === 20 && sheetRookie === 0) autoArmyCheck = true;
                     if (sheetAge === 21 && sheetRookie === 30) autoArmyCheck = true;
                     if (sheetAge === 22 && sheetRookie === 20) autoArmyCheck = true;
                     if (sheetAge === 23 && sheetRookie === 10) autoArmyCheck = true;
