@@ -379,9 +379,14 @@
                 <span class="age-val"><span id="ageLab">20</span>세</span>
             </div>
             <input type="range" id="ageSlider" min="20" max="55" value="20" oninput="updateAgeLabel()">
-            <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; font-weight:600; color:#475569; cursor:pointer;">
-                <input type="checkbox" id="armyCheck" onchange="updateAgeLabel()"> 신인 버프 연장
-            </label>
+            <div style="display:flex; gap:12px; margin-top:5px;">
+                <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; font-weight:600; color:#475569; cursor:pointer;">
+                    <input type="checkbox" id="armyCheck" onchange="updateAgeLabel()"> 신인 버프 연장
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; font-weight:600; color:#475569; cursor:pointer;">
+                    <input type="checkbox" id="highCheck" onchange="updateAgeLabel()"> 고교 선수
+                </label>
+            </div>
         </div>
 
         <div class="input-group">
@@ -410,234 +415,247 @@
         <span class="notice-text">* 실제 스탯 계산은 소수 첫째 자리에서 반올림됩니다.</span>
     </div>
 
-    <div class="footer-area">
+<div class="footer-area">
         <div class="footer-link">
-            <div class="footer-link">
-                <a href="https://cafe.naver.com/best1ikbol" target="_blank">🏠 IKBOL 바로가기</a>
-                <a href="https://github.com/haesol00/ikbolCalculator" target="_blank">🛠️ 오류 및 건의 사항 (GitHub)</a>
-
-                <button class="copy-btn" onclick="copyShareLink()">🔗 현재 결과 링크 복사</button>
-            </div>
-            <div class="version-info">
-                버전: v3.1.1 | 최종 업데이트 날짜: 2026. 6. 8.
-            </div>
+            <a href="https://cafe.naver.com/best1ikbol" target="_blank">🏠 IKBOL 바로가기</a>
+            <a href="https://github.com/haesol00/ikbolCalculator" target="_blank">🛠️ 오류 및 건의 사항 (GitHub)</a>
+            <button class="copy-btn" onclick="copyShareLink()">🔗 현재 결과 링크 복사</button>
         </div>
+        <div class="version-info">
+            버전: v3.1.2 | 최종 업데이트 날짜: 2026. 7. 5.
+        </div>
+    </div>
 
-        <div id="toast" class="toast">링크가 클립보드에 복사되었습니다!</div>
+<div id="toast" class="toast">링크가 클립보드에 복사되었습니다!</div>
 
-        <script>
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxU2yDECn-Py0RsiT-FtWRwpENkntivWfCq9nwWSwb7weCGIC-6tGUVv2bLj0euYqdB1A/exec";
-            const WV = 1 / 70,
-                WP = 1 / 30,
-                WC = 1 / 350;
+<script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaWBpQLTOZ_bWTIv9TM-QPYY7bhMVemXLiTVRetX-iw1rofwyncNvHxmIvO3EJ3174VA/exec";
+        const WV = 1 / 70,
+            WP = 1 / 30,
+            WC = 1 / 350;
 
-            let rawData = {
-                preservation: 0,
-                rookie: 0,
-                army: 0,
-                national: 0,
-                eduTotal: 0,
-                buffEtc: 0,
-                retire: 0,
-                aging: 0,
-                nerfEtc: 0
-            };
+        let rawData = {
+            preservation: 0,
+            rookie: 0,
+            army: 0,
+            national: 0,
+            eduTotal: 0,
+            buffEtc: 0,
+            retire: 0,
+            aging: 0,
+            nerfEtc: 0
+        };
 
-            window.onload = function() {
-                updateAgeLabel();
+        window.onload = function() {
+            updateAgeLabel();
 
-                document.getElementById('nickInput').addEventListener('keydown', function(event) {
-                    if (event.key === 'Enter') {
-                        fetchData();
-                    }
-                });
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlNickname = urlParams.get('nickname'); // 주소창에서 nickname 값 가져오기
-
-                if (urlNickname) {
-                    document.getElementById('nickInput').value = urlNickname;
+            document.getElementById('nickInput').addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
                     fetchData();
                 }
-            };
+            });
 
-            function onToggleChange() {
-                updateAgeLabel();
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlNickname = urlParams.get('nickname'); // 주소창에서 nickname 값 가져오기
+
+            if (urlNickname) {
+                document.getElementById('nickInput').value = urlNickname;
+                fetchData();
             }
+        };
 
-            function updateAgeLabel() {
-                const age = Number(document.getElementById('ageSlider').value);
-                const isArmy = document.getElementById('armyCheck').checked;
-                document.getElementById('ageLab').innerText = age;
+        function onToggleChange() {
+            updateAgeLabel();
+        }
 
-                let rb = 0;
+        function updateAgeLabel() {
+            const age = Number(document.getElementById('ageSlider').value);
+            const isHigh = document.getElementById('highCheck').checked; 
+            const isUniv = rawData.army > 0;
+            
+            const armyCheckEl = document.getElementById('armyCheck');
+            if (isHigh || isUniv) {
+                armyCheckEl.checked = false;
+                armyCheckEl.disabled = true;
+            } else {
+                armyCheckEl.disabled = false;
+            }
+        
+            const isArmy = armyCheckEl.checked;
+            document.getElementById('ageLab').innerText = age;
+        
+            let rb = 0;
+            
+            if (!isHigh) {
                 const rAge = isArmy ? age - 1 : age;
                 if (rAge === 20) rb = 40;
                 else if (rAge === 21) rb = 30;
                 else if (rAge === 22) rb = 20;
                 else if (rAge === 23) rb = 10;
-
-                let an = rawData.aging;
-
-                let toggleBuffSum = 0;
-                let toggleNerfSum = 0;
-
-                if (document.getElementById('tgArmy')) {
-                    if (document.getElementById('tgArmy').checked) toggleBuffSum += rawData.army;
-                    if (document.getElementById('tgNational').checked) toggleBuffSum += rawData.national;
-                    if (document.getElementById('tgEdu').checked) toggleBuffSum += rawData.eduTotal;
-                    if (document.getElementById('tgBuffEtc').checked) toggleBuffSum += rawData.buffEtc;
-
-                    if (document.getElementById('tgNerfEtc').checked) toggleNerfSum += rawData.nerfEtc;
-                } else {
-                    // 초기 상태 연산
-                    toggleBuffSum += rawData.army + rawData.national + rawData.eduTotal + rawData.buffEtc;
-                    toggleNerfSum += rawData.nerfEtc;
-                }
-
-                document.getElementById('totalBuff').value = rawData.preservation + rb + toggleBuffSum;
-                document.getElementById('totalNerf').value = rawData.retire + an + toggleNerfSum;
-
-                let virtualAgingCheck = 0;
-                for (let i = 35; i <= age; i++) {
-                    if (i <= 36) virtualAgingCheck += 10;
-                    else if (i <= 39) virtualAgingCheck += 30;
-                    else if (i <= 42) virtualAgingCheck += 50;
-                    else virtualAgingCheck += 60;
-                }
-
-                const tag = document.getElementById('ageTag');
-                if (rb > 0) {
-                    tag.style.display = "inline-block";
-                    tag.innerText = `신인 버프 +${rb}`;
-                } else if (virtualAgingCheck > 0) {
-                    tag.style.display = "inline-block";
-                    tag.innerText = `노화 너프 -${virtualAgingCheck}`;
-                } else {
-                    tag.style.display = "none";
-                }
-
-                calc();
             }
+        
+            let an = rawData.aging;
+        
+            let toggleBuffSum = 0;
+            let toggleNerfSum = 0;
+        
+            if (document.getElementById('tgNational')) {
+                if (document.getElementById('tgNational').checked) toggleBuffSum += rawData.national;
+                if (document.getElementById('tgEdu').checked) toggleBuffSum += rawData.eduTotal;
+                if (document.getElementById('tgBuffEtc').checked) toggleBuffSum += rawData.buffEtc;
+        
+                if (document.getElementById('tgNerfEtc').checked) toggleNerfSum += rawData.nerfEtc;
+            } else {
+                toggleBuffSum += rawData.national + rawData.eduTotal + rawData.buffEtc;
+                toggleNerfSum += rawData.nerfEtc;
+            }
+        
+            document.getElementById('totalBuff').value = rawData.preservation + rb + rawData.army + toggleBuffSum;
+            document.getElementById('totalNerf').value = rawData.retire + an + toggleNerfSum;
+        
+            let virtualAgingCheck = 0;
+            for (let i = 35; i <= age; i++) {
+                if (i <= 36) virtualAgingCheck += 10;
+                else if (i <= 39) virtualAgingCheck += 30;
+                else if (i <= 42) virtualAgingCheck += 50;
+                else virtualAgingCheck += 60;
+            }
+        
+            const tag = document.getElementById('ageTag');
+            if (rb > 0) {
+                tag.style.display = "inline-block";
+                tag.innerText = `신인 버프 +${rb}`;
+            } else if (virtualAgingCheck > 0) {
+                tag.style.display = "inline-block";
+                        tag.innerText = `노화 너프 -${virtualAgingCheck}`;
+            } else {
+                tag.style.display = "none";
+            }
+        
+            calc();
+        }
 
-            function fetchData() {
-                const nick = document.getElementById('nickInput').value;
-                if (!nick) return;
-                document.getElementById('statusMsg').innerText = "조회 중...";
+        function fetchData() {
+            const nick = document.getElementById('nickInput').value;
+            if (!nick) return;
+            document.getElementById('statusMsg').innerText = "조회 중...";
 
-                fetch(SCRIPT_URL + "?nickname=" + encodeURIComponent(nick))
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.result === "success") {
-                            document.getElementById('statusMsg').innerText = `✅ '${data.nickname}'님 데이터 적용 완료`;
-                            document.getElementById('dynTitle').innerText = `🔍 ${data.nickname}님의 2080시즌 버프 및 너프`;
-                            const d = data.details;
-
-                            // 원본 데이터 백업
-                            rawData.preservation = Number(d.preservation) || 0;
-                            rawData.rookie = Number(d.rookie) || 0;
-                            rawData.army = Number(d.army) || 0;
-                            rawData.national = Number(d.national) || 0;
-                            rawData.eduTotal = (Number(d.eduWin) || 0) + (Number(d.eduMvp) || 0);
-                            rawData.buffEtc = Number(d.buffEtc) || 0;
-                            rawData.retire = Number(d.retire) || 0;
-                            rawData.aging = Number(d.aging) || 0; // 시트 노화 너프값 저장
-                            rawData.nerfEtc = Number(d.nerfEtc) || 0;
-
-                            const sheetAge = Number(d.age) || 20;
-                            const sheetRookie = rawData.rookie;
-
-                            // 자동 군필 판정
-                            let autoArmyCheck = (rawData.army > 0);
+            fetch(SCRIPT_URL + "?nickname=" + encodeURIComponent(nick))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === "success") {
+                        document.getElementById('statusMsg').innerText = `✅ '${data.nickname}'님 데이터 적용 완료`;
+                        document.getElementById('dynTitle').innerText = `🔍 ${data.nickname}님의 2081시즌 버프 및 너프`;
+                        const d = data.details;
+            
+                        rawData.preservation = Number(d.preservation) || 0;
+                        rawData.rookie = Number(d.rookie) || 0;
+                        rawData.army = Number(d.army) || 0; 
+                        rawData.national = Number(d.national) || 0;
+                        rawData.eduTotal = (Number(d.eduWin) || 0) + (Number(d.eduMvp) || 0);
+                        rawData.buffEtc = Number(d.buffEtc) || 0;
+                        rawData.retire = Number(d.retire) || 0;
+                        rawData.aging = Number(d.aging) || 0;
+                        rawData.nerfEtc = Number(d.nerfEtc) || 0;
+            
+                        const sheetAge = Number(d.age) || 20;
+                        const sheetRookie = rawData.rookie;
+                        
+                        const isHighSchooler = d.high === true || String(d.high).toUpperCase() === "TRUE";
+            
+                        document.getElementById('ageSlider').value = sheetAge;
+                        document.getElementById('highCheck').checked = isHighSchooler;
+                        const isUnivSchooler = (rawData.army > 0);
+                        
+                        let autoArmyCheck = false;
+                        if (!isHighSchooler && !isUnivSchooler) {
+                            autoArmyCheck = (rawData.army > 0);
                             if (sheetAge === 20 && sheetRookie === 0) autoArmyCheck = true;
                             if (sheetAge === 21 && sheetRookie === 40) autoArmyCheck = true;
                             if (sheetAge === 22 && sheetRookie === 30) autoArmyCheck = true;
                             if (sheetAge === 23 && sheetRookie === 20) autoArmyCheck = true;
                             if (sheetAge === 24 && sheetRookie === 10) autoArmyCheck = true;
-
-                            document.getElementById('ageSlider').value = sheetAge;
-                            document.getElementById('armyCheck').checked = autoArmyCheck;
-                            document.getElementById('ageLab').innerText = sheetAge;
-
-                            // UI 렌더링
-                            document.getElementById('detailContent').innerHTML = `
-                        <div class="details-row"><span>보존 버프</span><span class="val-buff">+${rawData.preservation}</span></div>
-                        <div class="details-row"><span>신인 버프</span><span class="val-buff">+${rawData.rookie}</span></div>
-                        <div class="details-row"><span>은퇴 너프</span><span class="val-nerf">-${rawData.retire}</span></div>
-                        <div class="details-row"><span>노화 너프</span><span class="val-nerf">-${rawData.aging}</span></div>
-
-                        <div class="section-divider">추가 버프&너프</div>
-                        
-                        <div class="details-row">
-                            <div class="row-left"><span>군대 버프</span><span class="val-buff">+${rawData.army}</span></div>
-                            <label class="switch"><input type="checkbox" id="tgArmy" checked onchange="onToggleChange()"><span class="slider"></span></label>
-                        </div>
-                        <div class="details-row">
-                            <div class="row-left"><span>국대 버프</span><span class="val-buff">+${rawData.national}</span></div>
-                            <label class="switch"><input type="checkbox" id="tgNational" checked onchange="onToggleChange()"><span class="slider"></span></label>
-                        </div>
-                        <div class="details-row">
-                            <div class="row-left"><span>교육리그</span><span class="val-buff">+${rawData.eduTotal}</span></div>
-                            <label class="switch"><input type="checkbox" id="tgEdu" checked onchange="onToggleChange()"><span class="slider"></span></label>
-                        </div>
-                        <div class="details-row">
-                            <div class="row-left"><span>기타 버프</span><span class="val-buff">+${rawData.buffEtc}</span></div>
-                            <label class="switch"><input type="checkbox" id="tgBuffEtc" checked onchange="onToggleChange()"><span class="slider"></span></label>
-                        </div>
-                        <div class="details-row">
-                            <div class="row-left"><span>기타 너프</span><span class="val-nerf">-${rawData.nerfEtc}</span></div>
-                            <label class="switch"><input type="checkbox" id="tgNerfEtc" checked onchange="onToggleChange()"><span class="slider"></span></label>
-                        </div>
-                    `;
-                            document.getElementById('detailArea').style.display = "block";
-
-                            updateAgeLabel();
-                        } else {
-                            document.getElementById('statusMsg').innerText = "❌ 정보를 찾을 수 없습니다.";
                         }
-                    });
-            }
+                        
+                        document.getElementById('armyCheck').checked = autoArmyCheck;
+                        document.getElementById('ageLab').innerText = sheetAge;
 
-            function calc() {
-                const v = Number(document.getElementById('vIn').value) || 0;
-                const p = Number(document.getElementById('pIn').value) || 0;
-                const c = Number(document.getElementById('cIn').value) || 0;
-                const buff = Number(document.getElementById('totalBuff').value) || 0;
-                const nerf = Number(document.getElementById('totalNerf').value) || 0;
-                const act = (v * WV) + (p * WP) + (c * WC);
-                document.getElementById('pureStats').innerText = act.toFixed(2);
-                document.getElementById('finalStats').innerText = (act + buff - nerf).toFixed(2);
-            }
+                        // UI 렌더링
+                        document.getElementById('detailContent').innerHTML = `
+                            <div class="details-row"><span>보존 버프</span><span class="val-buff">+${rawData.preservation}</span></div>
+                            <div class="details-row"><span>신인 버프</span><span class="val-buff">+${rawData.rookie}</span></div>
+                            <div class="details-row"><span>대학 버프</span><span class="val-buff">+${rawData.army}</span></div>
+                            <div class="details-row"><span>은퇴 너프</span><span class="val-nerf">-${rawData.retire}</span></div>
+                            <div class="details-row"><span>노화 너프</span><span class="val-nerf">-${rawData.aging}</span></div>
+                        
+                            <div class="section-divider">추가 버프&너프</div>
+                            
+                            <div class="details-row">
+                                <div class="row-left"><span>국대 버프</span><span class="val-buff">+${rawData.national}</span></div>
+                                <label class="switch"><input type="checkbox" id="tgNational" checked onchange="onToggleChange()"><span class="slider"></span></label>
+                            </div>
+                            <div class="details-row">
+                                <div class="row-left"><span>교육리그</span><span class="val-buff">+${rawData.eduTotal}</span></div>
+                                <label class="switch"><input type="checkbox" id="tgEdu" checked onchange="onToggleChange()"><span class="slider"></span></label>
+                            </div>
+                            <div class="details-row">
+                                <div class="row-left"><span>기타 버프</span><span class="val-buff">+${rawData.buffEtc}</span></div>
+                                <label class="switch"><input type="checkbox" id="tgBuffEtc" checked onchange="onToggleChange()"><span class="slider"></span></label>
+                            </div>
+                            <div class="details-row">
+                                <div class="row-left"><span>기타 너프</span><span class="val-nerf">-${rawData.nerfEtc}</span></div>
+                                <label class="switch"><input type="checkbox" id="tgNerfEtc" checked onchange="onToggleChange()"><span class="slider"></span></label>
+                            </div>
+                        `;
+                        document.getElementById('detailArea').style.display = "block";
 
-            function copyShareLink() {
-                const nick = document.getElementById('nickInput').value.trim();
-
-                // 현재 접속 중인 기본 URL 가져오기 (파라미터 제외한 순수 주소)
-                const baseUrl = window.location.origin + window.location.pathname;
-
-                // 닉네임 입력 여부에 따라 주소 조합
-                const shareUrl = nick ? `${baseUrl}?nickname=${encodeURIComponent(nick)}` : baseUrl;
-
-                // 클립보드에 복사 실행
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    // 토스트 문구 설정
-                    const toast = document.getElementById('toast');
-                    if (nick) {
-                        toast.innerText = `'${nick}'님의 결과 링크가 복사되었습니다!`;
+                        updateAgeLabel();
                     } else {
-                        toast.innerText = `기본 계산기 링크가 복사되었습니다!`;
+                        document.getElementById('statusMsg').innerText = "❌ 정보를 찾을 수 없습니다.";
                     }
-
-                    // 토스트 알림 등장 애니메이션 후 2.5초 뒤 사라짐
-                    toast.classList.add('show');
-                    setTimeout(() => {
-                        toast.classList.remove('show');
-                    }, 2500);
-                }).catch(err => {
-                    alert('링크 복사에 실패했습니다. 주소창을 직접 복사해 주세요.');
                 });
-            }
-        </script>
+        }
+
+        function calc() {
+            const v = Number(document.getElementById('vIn').value) || 0;
+            const p = Number(document.getElementById('pIn').value) || 0;
+            const c = Number(document.getElementById('cIn').value) || 0;
+            const buff = Number(document.getElementById('totalBuff').value) || 0;
+            const nerf = Number(document.getElementById('totalNerf').value) || 0;
+            const act = (v * WV) + (p * WP) + (c * WC);
+            document.getElementById('pureStats').innerText = act.toFixed(2);
+            document.getElementById('finalStats').innerText = (act + buff - nerf).toFixed(2);
+        }
+
+        function copyShareLink() {
+            const nick = document.getElementById('nickInput').value.trim();
+
+            // 현재 접속 중인 기본 URL 가져오기 (파라미터 제외한 순수 주소)
+            const baseUrl = window.location.origin + window.location.pathname;
+
+            // 닉네임 입력 여부에 따라 주소 조합
+            const shareUrl = nick ? `${baseUrl}?nickname=${encodeURIComponent(nick)}` : baseUrl;
+
+            // 클립보드에 복사 실행
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                // 토스트 문구 설정
+                const toast = document.getElementById('toast');
+                if (nick) {
+                    toast.innerText = `'${nick}'님의 결과 링크가 복사되었습니다!`;
+                } else {
+                    toast.innerText = `기본 계산기 링크가 복사되었습니다!`;
+                }
+
+                // 토스트 알림 등장 애니메이션 후 2.5초 뒤 사라짐
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            }).catch(err => {
+                alert('링크 복사에 실패했습니다. 주소창을 직접 복사해 주세요.');
+            });
+        }
+    </script>
 </body>
 
 </html>
