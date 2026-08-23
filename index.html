@@ -422,7 +422,7 @@
             <button class="copy-btn" onclick="copyShareLink()">🔗 현재 결과 링크 복사</button>
         </div>
         <div class="version-info">
-            버전: v3.1.2 | 최종 업데이트 날짜: 2026. 7. 5.
+            버전: v3.1.3 | 최종 업데이트 날짜: 2026. 8. 23.
         </div>
     </div>
 
@@ -493,8 +493,16 @@
                 else if (rAge === 22) rb = 20;
                 else if (rAge === 23) rb = 10;
             }
-        
-            let an = rawData.aging;
+
+            let virtualAgingCheck = 0;
+            for (let i = 35; i <= age; i++) {
+                if (i <= 36) virtualAgingCheck += 10;
+                else if (i <= 39) virtualAgingCheck += 30;
+                else if (i <= 42) virtualAgingCheck += 50;
+                else virtualAgingCheck += 60;
+            }
+
+            let an = virtualAgingCheck;
         
             let toggleBuffSum = 0;
             let toggleNerfSum = 0;
@@ -511,15 +519,7 @@
             }
         
             document.getElementById('totalBuff').value = rawData.preservation + rb + rawData.army + toggleBuffSum;
-            document.getElementById('totalNerf').value = rawData.retire + an + toggleNerfSum;
-        
-            let virtualAgingCheck = 0;
-            for (let i = 35; i <= age; i++) {
-                if (i <= 36) virtualAgingCheck += 10;
-                else if (i <= 39) virtualAgingCheck += 30;
-                else if (i <= 42) virtualAgingCheck += 50;
-                else virtualAgingCheck += 60;
-            }
+            document.getElementById('totalNerf').value = rawData.retire + an + toggleNerfSum;     
         
             const tag = document.getElementById('ageTag');
             if (rb > 0) {
